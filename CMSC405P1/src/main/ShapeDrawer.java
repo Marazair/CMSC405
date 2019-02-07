@@ -25,6 +25,22 @@ import javax.swing.Timer;
 
 
 public class ShapeDrawer extends JPanel {
+	
+	static class TransformHolder {
+		static int translateX = 0;
+		static int translateY = 0;
+		static double rotation = 0.0;
+		static double scaleX = 1.0;
+		static double scaleY = 1.0;
+		
+		static void reset() {
+			translateX = 0;
+			translateY = 0;
+			rotation = 0.0;
+			scaleX = 1.0;
+			scaleY = 1.0;
+		}
+	}
 
 	private static final long serialVersionUID = 1L;
 	// A counter that increases by one in each frame.
@@ -40,16 +56,17 @@ public class ShapeDrawer extends JPanel {
     private static final int FRAMES = 5;
     
     //Variable for storing the maximum image size after all transforms
-    private static int imageSize = 50;
+    private final static int IMAGE_SIZE = 50;
     
     //Variable for storing the offset used by applyWindowToViewportTransformation
-    private static int offset = imageSize*4;
+    private final static int OFFSET = IMAGE_SIZE * 4;
+    
+    //Variable for storing number of images
+    private final static int NUM_IMAGES = 3;
+    
+    //Variable for storing how many images have been drawn per loop
+    private static int imageNum = 1;
 
-    static int translateX = 0;
-    static int translateY = 0;
-    static double rotation = 0.0;
-    static double scaleX = 1.0;
-    static double scaleY = 1.0;
     ShapeFetcher myImages = new ShapeFetcher();
     BufferedImage tImage = myImages.getImage(ShapeFetcher.letterT);
     BufferedImage oImage = myImages.getImage(ShapeFetcher.letterO);
@@ -122,76 +139,60 @@ public class ShapeDrawer extends JPanel {
          * transformed coordinate system.
          */
         // Controls your zoom and area you are looking at
-        applyWindowToViewportTransformation(g2, -offset, 0, 0, offset, true);
+        applyWindowToViewportTransformation(g2, -OFFSET, 0, 0, OFFSET, true);
 
         AffineTransform savedTransform = g2.getTransform();
         System.out.println("Frame is " + frameNumber);
         switch (frameNumber) {
             case 1: // First frame is unmodified.
-                 translateX = 0;
-                 translateY = 0;
-                 scaleX = 1.0;
-                 scaleY = 1.0;
-                 rotation = 0;
+            	TransformHolder.reset();
                 break;
             case 2: // Second frame translates each image by (-5, 7).
-                translateX = -5;
-                translateY = 7;
-                break;
+                TransformHolder.translateX = -5;
+                TransformHolder.translateY = 7;
+                break; 
+            // Can add more cases as needed 
             case 3: // Third frame rotates each image by 45 degrees counterclockwise.
-                translateX = -5;
-                translateY = 7;
-                rotation = 45*Math.PI / 180.0;
+                TransformHolder.rotation = 45*Math.PI / 180.0;
                 break;
             case 4: // Fourth frame rotates each image by 90 degrees clockwise.
-            	translateX = -5;
-            	translateY = 7;
-            	rotation = (45*Math.PI / 180.0) - (90*Math.PI / 180.0);
+            	TransformHolder.rotation -= (90*Math.PI / 180.0);
             	break;
             case 5: // Fifth frame scales 2x, .5y.
-            	translateX = -5;
-            	translateY = 7;
-            	rotation = (45*Math.PI / 180.0) - (90*Math.PI / 180.0);
-            	scaleX = 2.0;
-            	scaleY = 0.5;
+            	TransformHolder.scaleX = 2.0;
+            	TransformHolder.scaleY = 0.5;
             	break;
-           // Can add more cases as needed 
             default:
                 break;
         } // End switch
         
         
         //Add a T image.
-        g2.translate(translateX, translateY); // Move image.
-        // To offset translate again
-        g2.translate(-imageSize, imageSize);
-        g2.rotate(rotation); // Rotate image.
-        g2.scale(scaleX, scaleY); // Scale image.
-        g2.drawImage(cImage, 0, 0, this); // Draw image.
-        g2.setTransform(savedTransform);
-        
-        // You can add more shapes/images as needed
+        drawImage(tImage, g2, savedTransform);
         
         // Add an O image
-        g2.translate(translateX, translateY); // Move image.
-        // To offset translate again
-        // This allows you to place your images across your graphic
-        g2.translate(-(2*imageSize), 2*imageSize);
-        g2.rotate(rotation); // Rotate image.
-        g2.scale(scaleX, scaleY); // Scale image.
-        g2.drawImage(tImage, 0, 0, this); // Draw image.
-        g2.setTransform(savedTransform);
+        drawImage(oImage, g2, savedTransform);
 
 	    // Add a C image
-	    g2.translate(translateX, translateY);
-	    // To offset translate again
-	    g2.translate(-(3*imageSize), 3*imageSize);
-	    g2.rotate(rotation); // Rotate image.
-	    g2.scale(scaleX, scaleY); // Scale image.
-	    g2.drawImage(oImage, 0, 0, this); // Draw image.
-	    g2.setTransform(savedTransform);
+	    drawImage(cImage, g2, savedTransform);
        
-
+	    // Reset image count
+	    imageNum = 1;
+    }
+    
+    //Contains logic to draw the image according to current parameters.
+    private void drawImage(BufferedImage image, Graphics2D graphic, 
+    		AffineTransform transform) {
+    	int imageOffset = imageNum * IMAGE_SIZE;
+    	
+    	graphic.translate(TransformHolder.translateX, TransformHolder.translateY);
+    	graphic.translate(-(imageOffset), imageOffset);
+    	graphic.rotate(TransformHolder.rotation);
+    	graphic.scale(TransformHolder.scaleX, TransformHolder.scaleY);
+    	graphic.drawImage(image, 0, 0, this);
+    	graphic.setTransform(transform);
+    	
+    	imageNum++;
     }
 
     // Method taken directly from AnimationStarter.java Code
