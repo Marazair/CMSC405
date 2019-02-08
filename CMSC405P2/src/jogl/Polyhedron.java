@@ -355,7 +355,7 @@ public class Polyhedron {
        }
     );
 
-    public static Polyhedron socerBall = new Polyhedron( 
+    public static Polyhedron soccerBall = new Polyhedron( 
         new double[][] {
           {-0.666667,-0.745356,0.206011},
           {-0.666667,-0.745356,-0.206011},
