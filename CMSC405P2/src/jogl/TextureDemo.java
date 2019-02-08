@@ -110,7 +110,7 @@ public class TextureDemo extends GLJPanel implements GLEventListener, KeyListene
         for (int i = 0; i < textureFileNames.length; i++) {
             try {
                 URL textureURL;
-                textureURL = getClass().getClassLoader().getResource("textures/" + textureFileNames[i]);
+                textureURL = getClass().getClassLoader().getResource("src/jogl/textures/" + textureFileNames[i]);
                 if (textureURL != null) {
 //                    textures[i] = TextureIO.newTexture(textureURL, true, null);  // Alternative loader, gives upside down textures!
                     BufferedImage img = ImageIO.read(textureURL);

@@ -192,7 +192,7 @@ public class IFSPolyhedronViewer extends GLJPanel implements GLEventListener {
                 case "Icosahedron": currentModel = Polyhedron.icosahedron; break;
                 case "Octahedron": currentModel = Polyhedron.octahedron; break;
                 case "Rhombic Dodecahedron": currentModel = Polyhedron.rhombicDodecahedron; break;
-                case "Socer Ball": currentModel = Polyhedron.socerBall; break;
+                case "Socer Ball": currentModel = Polyhedron.soccerBall; break;
                 case "Stellated Dodecahedron": currentModel = Polyhedron.stellatedDodecahedron; break;
                 case "Stellated Icosahedron": currentModel = Polyhedron.stellatedIcosahedron; break;
                 case "Stellated Octahedron": currentModel = Polyhedron.stellatedOctahedron; break;
