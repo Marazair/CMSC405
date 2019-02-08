@@ -118,7 +118,7 @@ public class FieldScene extends JPanel implements
         
         gl.glPushMatrix();
         gl.glTranslated(BOX_X, BOX_Y, BOX_Z);
-        box.draw(gl);
+        cube(gl, 1);
         gl.glPopMatrix();
     }
     
@@ -253,7 +253,7 @@ public class FieldScene extends JPanel implements
         // TODO:  Add code to respond to key presses.
         
         if (key == KeyEvent.VK_UP) {
-        	if (pz < TREE_Z)
+        	if (pz < BOX_Z - 1)
         		pz += STEP;
         	else {
         		
