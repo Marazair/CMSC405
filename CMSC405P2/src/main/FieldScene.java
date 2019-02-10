@@ -25,7 +25,7 @@ public class FieldScene extends JPanel implements
 	private static final int YDIMENSION = 480;
 	private static final double ASPECT = XDIMENSION/YDIMENSION;
 	private static final int FOV = 45;
-	private static final int MAX_VIEW = 80;
+	private static final int MAX_VIEW = 400;
 	private static final int MIN_VIEW = 1;
 	private static int STEP = 1;
 	
@@ -35,31 +35,36 @@ public class FieldScene extends JPanel implements
 	private static final int BOX_HEIGHT = 3;
 	private static final int BOX_WIDTH = 4;
 	private static final int BOX_LENGTH = 4;
-	
 	private static double[] BOX_RGB = {.65, .53, .33};
 	private static boolean boxOpen = false;
-	
-	private static Prism box = new Prism(BOX_HEIGHT, new Rectangle(BOX_WIDTH, BOX_LENGTH, BOX_RGB));
+	private static RectangularPrism box = new RectangularPrism(BOX_HEIGHT, new Rectangle(BOX_WIDTH, BOX_LENGTH, BOX_RGB));
 	
 	private static final double[] BLOOD_RGB = {.29, .01, .01};
+	private static float[] SKY_RGB = {0.53f, .81f, .98f};
+	private static final float[] SPOOKY_SKY_RGB = {0.53f, 0.11f, 0.89f};
 	
 	private static final int TREE_X = 0;
 	private static final int TREE_Y = 0;
 	private static final int TREE_Z = 25;
-	private static final double[] TRUNK_RGB = {103/255, 84/255, 78/255};
-	private static double[] TREE_RGB = {34/255, 139/255, 34/255};
+	private static final double[] TRUNK_RGB = {.40, .33, .31};
+	private static double[] TREE_RGB = {.13, .55, .13};
+	
+	private static double[] GRASS_RGB = {0, 1, 0};
+	private static final double[] SPOOKY_GRASS_RGB = {.65, 0, 0};
+	private static final int GRASS_SIZE = 500;
+	private static Rectangle ground = new Rectangle(GRASS_SIZE, GRASS_SIZE, GRASS_RGB);
 	
 	private static int px = 0;
 	private static int py = 10;
 	private static int pz = 0;
 	
+	private static JFrame window;
+	
 	
     public static void main(String[] args) {
-        JFrame window = new JFrame("JOGL");
+        window = new JFrame("A Field: Walk toward the box with Up Arrow");
         FieldScene panel = new FieldScene();
         window.setContentPane(panel);
-        /* TODO: If you want to have a menu, comment out the following line. */
-        //window.setJMenuBar(panel.createMenuBar());
         window.pack();
         window.setLocation(50,50);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -80,13 +85,8 @@ public class FieldScene extends JPanel implements
         add(display,BorderLayout.CENTER);
         // TODO:  Other components could be added to the main panel.
         
-        // TODO:  Uncomment the next two lines to enable keyboard event handling
         display.requestFocusInWindow();
         display.addKeyListener(this);
-
-        // TODO:  Uncomment the next one or two lines to enable mouse event handling
-        //display.addMouseListener(this);
-        //display.addMouseMotionListener(this);
         
         //TODO:  Uncomment the following line to start the animation
         //startAnimation();
@@ -103,6 +103,9 @@ public class FieldScene extends JPanel implements
 
         GL2 gl = drawable.getGL().getGL2();
         GLU glu = new GLU();
+        
+        gl.glClearColor(SKY_RGB[0], SKY_RGB[1], SKY_RGB[2], 1);
+        
         gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT ); // TODO? Omit depth buffer for 2D.
 
         gl.glMatrixMode(GL2.GL_PROJECTION);  // TODO: Set up a better projection?
@@ -118,7 +121,14 @@ public class FieldScene extends JPanel implements
         
         gl.glPushMatrix();
         gl.glTranslated(BOX_X, BOX_Y, BOX_Z);
-        cube(gl, 1);
+        //cube(gl, 1);
+        box.draw(gl);
+        gl.glPopMatrix();
+        
+        gl.glPushMatrix();
+        gl.glTranslated(0, -BOX_HEIGHT/2, 0);
+        gl.glRotated(90, -1, 0, 0);
+        ground.draw(gl);
         gl.glPopMatrix();
     }
     
@@ -256,11 +266,16 @@ public class FieldScene extends JPanel implements
         	if (pz < BOX_Z - 1)
         		pz += STEP;
         	else {
-        		
+        		if(!boxOpen) {
+        			SKY_RGB = SPOOKY_SKY_RGB;
+            		ground.setColor(SPOOKY_GRASS_RGB);
+            		boxOpen = true;
+        		}
         	}
         }
         else if (key == KeyEvent.VK_DOWN) {
-        	pz -= STEP;
+        	if (pz > TREE_Z - 80)
+        		pz -= STEP;
         }
         
         display.repaint();  // Causes the display() function to be called.
