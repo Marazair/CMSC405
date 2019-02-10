@@ -19,7 +19,7 @@ import jogl.*;
  * from earlier versions; in particular, some of the package names have changed.
  */
 public class FieldScene extends JPanel implements 
-                   GLEventListener, KeyListener, MouseListener, MouseMotionListener, ActionListener {
+                   GLEventListener, KeyListener, ActionListener {
 	
 	private static final int XDIMENSION = 640;
 	private static final int YDIMENSION = 480;
@@ -39,9 +39,16 @@ public class FieldScene extends JPanel implements
 	private static boolean boxOpen = false;
 	private static RectangularPrism box = new RectangularPrism(BOX_HEIGHT, new Rectangle(BOX_WIDTH, BOX_LENGTH, BOX_RGB));
 	
-	private static final double[] BLOOD_RGB = {.29, .01, .01};
 	private static float[] SKY_RGB = {0.53f, .81f, .98f};
 	private static final float[] SPOOKY_SKY_RGB = {0.53f, 0.11f, 0.89f};
+	
+	private static final int SUN_X = 5;
+	private static final int SUN_Y = 40;
+	private static final int SUN_Z = 300;
+	private static final int SUN_SIZE = 20;
+	private static final double[] SUN_RGB = {.99, .72, .07};
+	private static final double[] SPOOKY_SUN_RGB = {.29, .01, .01};
+	private static Circle sun = new Circle(SUN_SIZE, SUN_RGB);
 	
 	private static final int TREE_X = 0;
 	private static final int TREE_Y = 0;
@@ -130,6 +137,15 @@ public class FieldScene extends JPanel implements
         gl.glRotated(90, -1, 0, 0);
         ground.draw(gl);
         gl.glPopMatrix();
+        
+        gl.glPushMatrix();
+        gl.glTranslated(SUN_X, SUN_Y, SUN_Z);
+        sun.draw(gl);
+        gl.glPopMatrix();
+        
+        gl.glPushMatrix();
+        
+        gl.glPopMatrix();
     }
     
     private void square(GL2 gl2, double r, double g, double b) {
@@ -170,7 +186,7 @@ public class FieldScene extends JPanel implements
         
         gl2.glPushMatrix();
         gl2.glRotated(90, 1, 0, 0);
-        square(gl2, BLOOD_RGB[0], BLOOD_RGB[1], BLOOD_RGB[2]); // red bottom face
+        square(gl2, BOX_RGB[0], BOX_RGB[1], BOX_RGB[2]); // red bottom face
         gl2.glPopMatrix();
         
         gl2.glPopMatrix(); // Restore matrix to its state before cube() was called.
@@ -214,39 +230,6 @@ public class FieldScene extends JPanel implements
     }
     
     
-    // ------------ Support for a menu -----------------------
-    
-    public JMenuBar createMenuBar() {
-        JMenuBar menubar = new JMenuBar();
-        
-        MenuHandler menuHandler = new MenuHandler(); // An object to respond to menu commands.
-        
-        JMenu menu = new JMenu("Menu"); // Create a menu and add it to the menu bar
-        menubar.add(menu);
-        
-        JMenuItem item = new JMenuItem("Quit");  // Create a menu command.
-        item.addActionListener(menuHandler);  // Set up handling for this command.
-        menu.add(item);  // Add the command to the menu.
-        
-        // TODO:  Add additional menu commands and menus.
-        
-        return menubar;
-    }
-    
-    /**
-     * A class to define the ActionListener object that will respond to menu commands.
-     */
-    private class MenuHandler implements ActionListener {
-        public void actionPerformed(ActionEvent evt) {
-            String command = evt.getActionCommand();  // The text of the command.
-            if (command.equals("Quit")) {
-                System.exit(0);
-            }
-            // TODO: Implement any additional menu commands.
-        }
-    }
-
-    
     // ------------ Support for keyboard handling  ------------
 
     /**
@@ -269,6 +252,8 @@ public class FieldScene extends JPanel implements
         		if(!boxOpen) {
         			SKY_RGB = SPOOKY_SKY_RGB;
             		ground.setColor(SPOOKY_GRASS_RGB);
+            		sun.setColor(SPOOKY_SUN_RGB);
+            		window.setTitle("RUN!");
             		boxOpen = true;
         		}
         	}
@@ -335,63 +320,4 @@ public class FieldScene extends JPanel implements
         updateFrame();
         display.repaint();
     }
-
-    
-    
-    // ---------------------- support for mouse events ----------------------
-    
-    private boolean dragging;  // is a drag operation in progress?
-    
-    private int startX, startY;  // starting location of mouse during drag
-    private int prevX, prevY;    // previous location of mouse during drag
-    
-    /**
-     * Called when the user presses a mouse button on the display.
-     */
-    public void mousePressed(MouseEvent evt) {
-        if (dragging) {
-            return;  // don't start a new drag while one is already in progress
-        }
-        int x = evt.getX();  // mouse location in pixel coordinates.
-        int y = evt.getY();
-        // TODO: respond to mouse click at (x,y)
-        dragging = true;  // might not always be correct!
-        prevX = startX = x;
-        prevY = startY = y;
-        display.repaint();    //  only needed if display should change
-    }
-
-    /**
-     * Called when the user releases a mouse button after pressing it on the display.
-     */
-    public void mouseReleased(MouseEvent evt) {
-        if (! dragging) {
-            return;
-        }
-        dragging = false;
-        // TODO:  finish drag (generally nothing to do here)
-    }
-
-    /**
-     * Called during a drag operation when the user drags the mouse on the display/
-     */
-    public void mouseDragged(MouseEvent evt) {
-        if (! dragging) {
-            return;
-        }
-        int x = evt.getX();  // mouse location in pixel coordinates.
-        int y = evt.getY();
-        // TODO:  respond to mouse drag to new point (x,y)
-        prevX = x;
-        prevY = y;
-        display.repaint();
-    }
-
-    public void mouseMoved(MouseEvent evt) { }    // Other methods required for MouseListener, MouseMotionListener.
-    public void mouseClicked(MouseEvent evt) { }
-    public void mouseEntered(MouseEvent evt) { }
-    public void mouseExited(MouseEvent evt) { }
-
-
-
 }
