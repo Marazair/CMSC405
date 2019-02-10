@@ -3,17 +3,17 @@ package main;
 import com.jogamp.opengl.GL2;
 
 public class RectangularPrism extends Shape {
-	private int height;
-	private Rectangle shape;
-	private Rectangle lengthSides;
-	private Rectangle widthSides;
+	protected int height;
+	protected Rectangle shape;
+	protected Rectangle lengthSides;
+	protected Rectangle widthSides;
 	
 	public RectangularPrism(int height, Rectangle shape) {
 		this.height = height;
 		this.shape = shape;
 		
-		lengthSides = new Rectangle(shape.getLength(), height, shape.color);
-		widthSides = new Rectangle(shape.getWidth(), height, shape.color);
+		lengthSides = new Rectangle(height, shape.getLength(), shape.color);
+		widthSides = new Rectangle(height, shape.getWidth(), shape.color);
 	}
 	
 	@Override
@@ -24,42 +24,53 @@ public class RectangularPrism extends Shape {
 		gl2.glPushMatrix();
         
 		gl2.glPushMatrix();
-		gl2.glTranslated(0, 0, -length/2);
+		gl2.glTranslated(0, 0, -(double)length/2);
         widthSides.draw(gl2); //front face
+        widthSides.borders(gl2);
         gl2.glPopMatrix();
         
         gl2.glPushMatrix();
         gl2.glRotated(90, 0, 1, 0);
-        gl2.glTranslated(0, 0, -width/2);
+        gl2.glTranslated(0, 0, -(double)width/2);
         lengthSides.draw(gl2); // right face
+        lengthSides.borders(gl2);
         gl2.glPopMatrix();
         
         gl2.glPushMatrix();
         gl2.glRotated(90, 1, 0, 0);
-        gl2.glTranslated(0, 0, -height/2);
+        gl2.glTranslated(0, 0, -(double)height/2);
         shape.draw(gl2); // top face
+        shape.borders(gl2);
         gl2.glPopMatrix();
         
        	gl2.glPushMatrix();
-		gl2.glTranslated(0, 0, length/2);
-        widthSides.draw(gl2); //front face
+		gl2.glTranslated(0, 0, (double)length/2);
+        widthSides.draw(gl2); //rear face
+        widthSides.borders(gl2);
         gl2.glPopMatrix();
         
         gl2.glPushMatrix();
         gl2.glRotated(90, 0, 1, 0);
-        gl2.glTranslated(0, 0, width/2);
+        gl2.glTranslated(0, 0, (double)width/2);
         lengthSides.draw(gl2); // right face
+        lengthSides.borders(gl2);
         gl2.glPopMatrix();
         
         gl2.glPushMatrix();
         gl2.glRotated(90, 1, 0, 0);
-        gl2.glTranslated(0, 0, height/2);
+        gl2.glTranslated(0, 0, (double)height/2);
         shape.draw(gl2); // bottom face
+        shape.borders(gl2);
         gl2.glPopMatrix();
         
         
         gl2.glPopMatrix(); // Restore matrix to its state before cube() was called.
 	}
 	
-	
+	@Override
+	public void setColor(double[] color) {
+		shape.color = color;
+		lengthSides.color = color;
+		widthSides.color = color;
+	}
 }

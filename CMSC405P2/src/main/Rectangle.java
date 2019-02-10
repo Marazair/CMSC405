@@ -16,20 +16,21 @@ public class Rectangle extends Shape2D {
 	public void draw(GL2 gl2) {
 		gl2.glColor3d(color[0], color[1], color[2]);
 	    gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-	    gl2.glVertex3d(-(double)length/2, -(double)width/2, 0);
-	    gl2.glVertex3d((double)length/2, -(double)width/2, 0);
-	    gl2.glVertex3d((double)length/2, (double)width/2, 0);
-        gl2.glVertex3d(-(double)length/2, (double)width/2, 0);
+	    gl2.glVertex3d(-(double)width/2, -(double)length/2, 0);
+	    gl2.glVertex3d((double)width/2, -(double)length/2, 0);
+	    gl2.glVertex3d((double)width/2, (double)length/2, 0);
+        gl2.glVertex3d(-(double)width/2, (double)length/2, 0);
         gl2.glEnd();
 	}
 	
 	public void borders(GL2 gl2) {
-		gl2.glColor3d(color[0], color[1], color[2]);
+		gl2.glColor3d(0,0,0);
+		gl2.glLineWidth(2f);
 	    gl2.glBegin(GL2.GL_LINES);
-	    gl2.glVertex3d(-(double)length/2, -(double)width/2, 0);
-	    gl2.glVertex3d((double)length/2, -(double)width/2, 0);
-	    gl2.glVertex3d((double)length/2, (double)width/2, 0);
-        gl2.glVertex3d(-(double)length/2, (double)width/2, 0);
+	    gl2.glVertex3d(-(double)width/2, -(double)length/2, 0);
+	    gl2.glVertex3d((double)width/2, -(double)length/2, 0);
+	    gl2.glVertex3d((double)width/2, (double)length/2, 0);
+        gl2.glVertex3d(-(double)width/2, (double)length/2, 0);
         gl2.glEnd();
 	}
 	

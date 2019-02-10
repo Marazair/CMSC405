@@ -6,7 +6,6 @@ import javax.swing.*;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.*;
-import jogl.*;
 
 /**
  * A template for a basic JOGL application with support for animation, and for
@@ -31,19 +30,18 @@ public class FieldScene extends JPanel implements
 	
 	private static final int BOX_X = 0;
 	private static final int BOX_Y = 0;
-	private static final int BOX_Z = 20;
-	private static final int BOX_HEIGHT = 3;
-	private static final int BOX_WIDTH = 4;
-	private static final int BOX_LENGTH = 4;
+	private static final int BOX_Z = 50;
+	private static final int BOX_HEIGHT = 5;
+	private static final int BOX_WIDTH = 6;
+	private static final int BOX_LENGTH = 6;
 	private static double[] BOX_RGB = {.65, .53, .33};
-	private static boolean boxOpen = false;
-	private static RectangularPrism box = 
-			new RectangularPrism(BOX_HEIGHT, new Rectangle(BOX_WIDTH, BOX_LENGTH, BOX_RGB));
+	private static Box box = 
+			new Box(BOX_HEIGHT, new Rectangle(BOX_LENGTH, BOX_WIDTH, BOX_RGB));
 	
 	private static float[] SKY_RGB = {0.53f, .81f, .98f};
 	private static final float[] SPOOKY_SKY_RGB = {0.53f, 0.11f, 0.89f};
 	
-	private static final int SUN_X = 5;
+	private static final int SUN_X = -50;
 	private static final int SUN_Y = 40;
 	private static final int SUN_Z = 300;
 	private static final int SUN_SIZE = 20;
@@ -55,21 +53,37 @@ public class FieldScene extends JPanel implements
 	private static Circle eye = new Circle(SUN_SIZE - 5, EYE_COLOR);
 	private static Circle pupil = new Circle(5, PUPIL_COLOR);
 	
-	private static final int TREE_X = 0;
+	private static final int TREE_X = 10;
 	private static final int TREE_Y = 0;
-	private static final int TREE_Z = 25;
+	private static final int TREE_Z = BOX_Z + 5;
 	private static final double[] TRUNK_RGB = {.40, .33, .31};
-	private static double[] TREE_RGB = {.13, .55, .13};
+	private static final double[] LEAVES_RGB = {.13, .55, .13};
+	private static final double[] SPOOKY_LEAVES_RGB = {.4, 0, 0};
 	private static final int TRUNK_HEIGHT = 20;
 	private static final int TRUNK_WIDTH = 5;
 	private static final int TRUNK_LENGTH = 5;
+	private static final int LEAVES_HEIGHT = 10;
+	private static final int LEAVES_WIDTH = 10;
+	private static final int LEAVES_LENGTH = 10;
 	private static RectangularPrism trunk = 
-			new RectangularPrism(TRUNK_HEIGHT, new Rectangle(TRUNK_WIDTH, TRUNK_LENGTH, TRUNK_RGB));
+			new RectangularPrism(TRUNK_HEIGHT, new Rectangle(TRUNK_LENGTH, TRUNK_WIDTH, TRUNK_RGB));
+	private static RectangularPrism leaves =
+			new RectangularPrism(LEAVES_HEIGHT, new Rectangle(LEAVES_LENGTH, LEAVES_WIDTH, LEAVES_RGB));
 	
 	private static double[] GRASS_RGB = {0, 1, 0};
-	private static final double[] SPOOKY_GRASS_RGB = {.65, 0, 0};
+	private static final double[] SPOOKY_GRASS_RGB = {.6, 0, 0};
 	private static final int GRASS_SIZE = 500;
 	private static Rectangle ground = new Rectangle(GRASS_SIZE, GRASS_SIZE, GRASS_RGB);
+	
+	private static final double[] SKULL_RGB = {.85, .83, .76};
+	private static final int SKULL_SIZE = 4;
+	private static int skullDistance = 10;
+	private static int skullX = BOX_X;
+	private static int skullY = BOX_Y + 1;
+	private static int skullZ = BOX_Z;
+	private static Skull skull = 
+			new Skull(SKULL_SIZE, new Rectangle(SKULL_SIZE, SKULL_SIZE, SKULL_RGB));
+	private boolean caught = false;
 	
 	private static int px = 0;
 	private static int py = 10;
@@ -92,6 +106,7 @@ public class FieldScene extends JPanel implements
     private Timer animationTimer;
 
     private int frameNumber = 0;  // The current frame number for an animation.
+    private int boxOpenFrame = 0;
 
     public FieldScene() {
         GLCapabilities caps = new GLCapabilities(null);
@@ -123,7 +138,7 @@ public class FieldScene extends JPanel implements
         
         gl.glClearColor(SKY_RGB[0], SKY_RGB[1], SKY_RGB[2], 1);
         
-        gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT ); // TODO? Omit depth buffer for 2D.
+        gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT | GL.GL_STENCIL_BUFFER_BIT); // TODO? Omit depth buffer for 2D.
 
         gl.glMatrixMode(GL2.GL_PROJECTION);  // TODO: Set up a better projection?
         gl.glLoadIdentity();
@@ -133,38 +148,53 @@ public class FieldScene extends JPanel implements
         gl.glLoadIdentity();             // Set up modelview transform. 
         
         // TODO: add drawing code here!!
-        
-        glu.gluLookAt(px,py,pz, BOX_X,BOX_Y,BOX_Z, 0,1,0);
-        
-        gl.glPushMatrix();
-        gl.glTranslated(BOX_X, BOX_Y, BOX_Z);
-        //cube(gl, 1);
-        box.draw(gl);
-        gl.glPopMatrix();
-        
-        gl.glPushMatrix();
-        gl.glTranslated(0, -BOX_HEIGHT/2, 0);
-        gl.glRotated(90, -1, 0, 0);
-        ground.draw(gl);
-        gl.glPopMatrix();
-        
-        gl.glPushMatrix();
-        gl.glTranslated(SUN_X, SUN_Y, SUN_Z);
-        gl.glRotated(-frameNumber*0.7,0,0,1);
-        sun.draw(gl);
-        rayDraw(gl);
-        if(boxOpen) {
-        	gl.glTranslated(0, 0, -2);
-        	eye.draw(gl);
-        	gl.glTranslated(0, 0, -2);
-        	pupil.draw(gl);
-        }
-        
-        gl.glPopMatrix();
-        
-        gl.glPushMatrix();
-        
-        gl.glPopMatrix();
+        if(!caught) {
+	        if(!box.open)
+	        	glu.gluLookAt(px,py,pz, BOX_X,BOX_Y,BOX_Z, 0,1,0);
+	        else
+	        	glu.gluLookAt(px,py,pz, skullX,skullY,skullZ, 0,1,0);
+	        
+	        gl.glStencilMask(0x00);
+	        
+	        gl.glPushMatrix();
+	        gl.glTranslated(BOX_X, BOX_Y, BOX_Z);
+	        box.draw(gl);
+	        gl.glPopMatrix();
+	        
+	        if(box.open) {
+	        	gl.glPushMatrix();
+	        	gl.glTranslated(skullX, skullY, skullZ);
+	        	skull.draw(gl);
+	        	gl.glPopMatrix();
+	        }
+	        
+	        gl.glPushMatrix();
+	        gl.glTranslated(0, -BOX_HEIGHT/2 - 1, 0);
+	        gl.glRotated(90, -1, 0, 0);
+	        ground.draw(gl);
+	        gl.glPopMatrix();
+	        
+	        gl.glPushMatrix();
+	        gl.glTranslated(SUN_X, SUN_Y, SUN_Z);
+	        gl.glRotated(-frameNumber*0.7,0,0,1);
+	        sun.draw(gl);
+	        rayDraw(gl);
+	        if(box.open) {
+	        	gl.glTranslated(0, 0, -2);
+	        	eye.draw(gl);
+	        	gl.glTranslated(0, 0, -2);
+	        	pupil.draw(gl);
+	        }
+	        
+	        gl.glPopMatrix();
+	        
+	        gl.glPushMatrix();
+	        gl.glTranslated(TREE_X, TREE_Y, TREE_Z);
+	        trunk.draw(gl);
+	        gl.glTranslated(0, TRUNK_HEIGHT - .5 * LEAVES_HEIGHT, 0);
+	        leaves.draw(gl);
+	        gl.glPopMatrix();
+	    }
     }
     
     private void rayDraw(GL2 gl2) {
@@ -176,51 +206,6 @@ public class FieldScene extends JPanel implements
             gl2.glEnd();
         }
     }
-    
-    private void square(GL2 gl2, double r, double g, double b) {
-        gl2.glColor3d(r,g,b);
-        gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-        gl2.glVertex3d(-0.5, -0.5, 0.5);
-        gl2.glVertex3d(0.5, -0.5, 0.5);
-        gl2.glVertex3d(0.5, 0.5, 0.5);
-        gl2.glVertex3d(-0.5, 0.5, 0.5);
-        gl2.glEnd();
-    }
-    
-    private void cube(GL2 gl2, double size) {
-        gl2.glPushMatrix();
-        gl2.glScaled(size,size,size); // scale unit cube to desired size
-        
-        square(gl2, BOX_RGB[0], BOX_RGB[1], BOX_RGB[2]);
-        
-        gl2.glPushMatrix();
-        gl2.glRotated(90, 0, 1, 0);
-        square(gl2, BOX_RGB[0], BOX_RGB[1], BOX_RGB[2]);
-        gl2.glPopMatrix();
-        
-        gl2.glPushMatrix();
-        gl2.glRotated(-90, 1, 0, 0);
-        square(gl2, BOX_RGB[0], BOX_RGB[1], BOX_RGB[2]);
-        gl2.glPopMatrix();
-        
-        gl2.glPushMatrix();
-        gl2.glRotated(180, 0, 1, 0);
-        square(gl2, BOX_RGB[0], BOX_RGB[1], BOX_RGB[2]);
-        gl2.glPopMatrix();
-        
-        gl2.glPushMatrix();
-        gl2.glRotated(-90, 0, 1, 0);
-        square(gl2, BOX_RGB[0], BOX_RGB[1], BOX_RGB[2]);
-        gl2.glPopMatrix();
-        
-        gl2.glPushMatrix();
-        gl2.glRotated(90, 1, 0, 0);
-        square(gl2, BOX_RGB[0], BOX_RGB[1], BOX_RGB[2]); // red bottom face
-        gl2.glPopMatrix();
-        
-        gl2.glPopMatrix(); // Restore matrix to its state before cube() was called.
-    }
-    
 
     /**
      * This is called when the GLJPanel is first created.  It can be used to initialize
@@ -232,7 +217,8 @@ public class FieldScene extends JPanel implements
         gl.glClearColor(0.3F, 0.3F, 0.3F, 1.0F);  // TODO: Set background color
 
         gl.glEnable(GL2.GL_DEPTH_TEST);  // TODO: Required for 3D drawing, not usually for 2D.
-        
+        gl.glEnable(GL.GL_STENCIL_TEST);
+        gl.glStencilOp(GL.GL_KEEP, GL.GL_KEEP, GL.GL_REPLACE);
         
         // TODO: Uncomment the following 4 lines to do some typical initialization for 
         // lighting and materials.
@@ -275,15 +261,17 @@ public class FieldScene extends JPanel implements
         // TODO:  Add code to respond to key presses.
         
         if (key == KeyEvent.VK_UP) {
-        	if (pz < BOX_Z - 1)
+        	if (pz < BOX_Z - 10)
         		pz += STEP;
         	else {
-        		if(!boxOpen) {
+        		if(!box.open) {
         			SKY_RGB = SPOOKY_SKY_RGB;
             		ground.setColor(SPOOKY_GRASS_RGB);
             		sun.setColor(SPOOKY_SUN_RGB);
+            		leaves.setColor(SPOOKY_LEAVES_RGB);
             		window.setTitle("RUN!");
-            		boxOpen = true;
+            		boxOpenFrame = frameNumber;
+            		box.open = true;
         		}
         	}
         }
@@ -326,6 +314,20 @@ public class FieldScene extends JPanel implements
     private void updateFrame() {
         frameNumber++;
         // TODO:  add any other updating required for the next frame.
+        
+        if(box.open) {
+        	if(frameNumber < boxOpenFrame + BOX_HEIGHT)
+        		skullY++;
+        	else {
+        		if (skullY < py)
+        			skullY++;
+        		if (skullZ > pz + SKULL_SIZE + skullDistance)
+        			skullZ--;
+        		else if (skullZ < pz + SKULL_SIZE + skullDistance)
+        			skullZ++;
+        			
+        	}
+        }
     }
     
     public void startAnimation() {
