@@ -2,7 +2,7 @@ package main;
 
 import com.jogamp.opengl.GL2;
 
-public class Circle extends Shape2D {
+public class Circle extends Shape {
 	int radius;
 	
 	public Circle(int radius, double[] color) {

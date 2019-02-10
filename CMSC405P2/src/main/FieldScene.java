@@ -1,3 +1,13 @@
+/*
+ * File Name: FieldScene.java
+ * Name: Nicholas Mills
+ * Date: 2/6/2019
+ * Purpose: A program built off of logic included in the JoglStarter,
+ * 			Unlit Cube and CartAndWindmillJogl2D examples to create
+ * 			an interactive scene with various different objects and
+ * 			transforms.
+ */
+
 package main;
 
 import java.awt.*;
@@ -11,16 +21,7 @@ import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.*;
 import javax.sound.sampled.*;
 
-/**
- * A template for a basic JOGL application with support for animation, and for
- * keyboard and mouse event handling, and for a menu.  To enable the support, 
- * uncomment the appropriate lines in main(), in the constructor, and in the
- * init() method.  See all the lines that are marked with "TODO".
- * 
- * See the JOGL documentation at http://jogamp.org/jogl/www/
- * Note that this program is based on JOGL 2.3, which has some differences
- * from earlier versions; in particular, some of the package names have changed.
- */
+
 public class FieldScene extends JPanel implements 
                    GLEventListener, KeyListener, ActionListener {
 	
@@ -89,9 +90,8 @@ public class FieldScene extends JPanel implements
 	private static double skullZ = BOX_Z;
 	private static Skull skull = 
 			new Skull(SKULL_SIZE, new Rectangle(SKULL_SIZE, SKULL_SIZE, SKULL_RGB));
-	private static final int TIME = 100;
+	private static final int TIME = 300;
 	private boolean caught = false;
-	private static final String CAUGHT_SOUND_PATH = "resources/Alarm.mp3";
 	
 	private static int px = 0;
 	private static int py = 10;
@@ -146,23 +146,21 @@ public class FieldScene extends JPanel implements
         
         gl.glClearColor(SKY_RGB[0], SKY_RGB[1], SKY_RGB[2], 1);
         
-        gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT | GL.GL_STENCIL_BUFFER_BIT); // TODO? Omit depth buffer for 2D.
+        gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
-        gl.glMatrixMode(GL2.GL_PROJECTION);  // TODO: Set up a better projection?
+        gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
         glu.gluPerspective(FOV, ASPECT, MIN_VIEW, MAX_VIEW);
         gl.glMatrixMode(GL2.GL_MODELVIEW);
 
         gl.glLoadIdentity();             // Set up modelview transform. 
         
-        // TODO: add drawing code here!!
         if(!caught) {
 	        if(!box.open)
 	        	glu.gluLookAt(px,py,pz, BOX_X,BOX_Y,BOX_Z, 0,1,0);
 	        else
 	        	glu.gluLookAt(px,py,pz, skullX,skullY,skullZ, 0,1,0);
 	        
-	        gl.glStencilMask(0x00);
 	        
 	        gl.glPushMatrix();
 	        gl.glTranslated(BOX_X, BOX_Y, BOX_Z);
@@ -226,19 +224,10 @@ public class FieldScene extends JPanel implements
     public void init(GLAutoDrawable drawable) {
             // called when the panel is created
         GL2 gl = drawable.getGL().getGL2();
-        gl.glClearColor(0.3F, 0.3F, 0.3F, 1.0F);  // TODO: Set background color
+        gl.glClearColor(0.3F, 0.3F, 0.3F, 1.0F);
 
-        gl.glEnable(GL2.GL_DEPTH_TEST);  // TODO: Required for 3D drawing, not usually for 2D.
-        gl.glEnable(GL.GL_STENCIL_TEST);
-        gl.glStencilOp(GL.GL_KEEP, GL.GL_KEEP, GL.GL_REPLACE);
+        gl.glEnable(GL2.GL_DEPTH_TEST);  // Required for 3D drawing, not usually for 2D.
         
-        // TODO: Uncomment the following 4 lines to do some typical initialization for 
-        // lighting and materials.
-
-        //gl.glEnable(GL2.GL_LIGHTING);        // Enable lighting.
-        //gl.glEnable(GL2.GL_LIGHT0);          // Turn on a light.  By default, shines from direction of viewer.
-        //gl.glEnable(GL2.GL_NORMALIZE);       // OpenGL will make all normal vectors into unit normals
-        //gl.glEnable(GL2.GL_COLOR_MATERIAL);  // Material ambient and diffuse colors can be set by glColor*
     }
 
     /**
@@ -270,7 +259,6 @@ public class FieldScene extends JPanel implements
      */
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();  // Tells which key was pressed.
-        // TODO:  Add code to respond to key presses.
         
         if (key == KeyEvent.VK_UP) {
         	if (pz < BOX_Z - 10)
@@ -301,9 +289,6 @@ public class FieldScene extends JPanel implements
      * actual character such as 'A' or '@'.
      */
     public void keyTyped(KeyEvent e) { 
-        char ch = e.getKeyChar();  // Which character was typed.
-        // TODO:  Add code to respond to the character being typed.
-        display.repaint();  // Causes the display() function to be called.
     }
 
     /**
@@ -333,7 +318,7 @@ public class FieldScene extends JPanel implements
         	else if (frameNumber < boxOpenFrame + TIME){
         		if (skullY < py)
         			skullY += SKULL_SPEED;
-        		if (skullZ > pz + SKULL_SIZE + skullDistance)
+        		if (skullZ > pz + SKULL_SIZE + SKULL_SPEED + skullDistance)
         			skullZ -= SKULL_SPEED;
         		else if (skullZ < pz + SKULL_SIZE + skullDistance)
         			skullZ++;

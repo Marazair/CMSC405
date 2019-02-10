@@ -2,7 +2,7 @@ package main;
 
 import com.jogamp.opengl.GL2;
 
-public class Rectangle extends Shape2D {
+public class Rectangle extends Shape {
 	private int length;
 	private int width;
 	
