@@ -23,39 +23,43 @@ public class RectangularPrism extends Shape {
 		
 		gl2.glPushMatrix();
         
-		gl2.glTranslated(0, 0, length/2);
+		gl2.glPushMatrix();
+		gl2.glTranslated(0, 0, -length/2);
         widthSides.draw(gl2); //front face
+        gl2.glPopMatrix();
         
         gl2.glPushMatrix();
-        gl2.glTranslated(0, 0, width/2);
         gl2.glRotated(90, 0, 1, 0);
+        gl2.glTranslated(0, 0, -width/2);
         lengthSides.draw(gl2); // right face
         gl2.glPopMatrix();
         
         gl2.glPushMatrix();
-        gl2.glTranslated(0, 0, height/2);
-        gl2.glRotated(-90, 1, 0, 0);
+        gl2.glRotated(90, 1, 0, 0);
+        gl2.glTranslated(0, 0, -height/2);
         shape.draw(gl2); // top face
         gl2.glPopMatrix();
         
-        gl2.glPushMatrix();
-        gl2.glTranslated(0, 0, length/2);
-        gl2.glRotated(180, 0, 1, 0);
-        widthSides.draw(gl2); // back face
+       	gl2.glPushMatrix();
+		gl2.glTranslated(0, 0, length/2);
+        widthSides.draw(gl2); //front face
         gl2.glPopMatrix();
         
         gl2.glPushMatrix();
+        gl2.glRotated(90, 0, 1, 0);
         gl2.glTranslated(0, 0, width/2);
-        gl2.glRotated(-90, 0, 1, 0);
-        lengthSides.draw(gl2);; // left face
+        lengthSides.draw(gl2); // right face
         gl2.glPopMatrix();
         
         gl2.glPushMatrix();
-        gl2.glTranslated(0, 0, height/2);
         gl2.glRotated(90, 1, 0, 0);
+        gl2.glTranslated(0, 0, height/2);
         shape.draw(gl2); // bottom face
         gl2.glPopMatrix();
         
+        
         gl2.glPopMatrix(); // Restore matrix to its state before cube() was called.
 	}
+	
+	
 }

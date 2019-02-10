@@ -20,5 +20,9 @@ public class Circle extends Shape2D {
         }
         gl2.glEnd();
 	}
+	
+	public int getRadius() {
+		return radius;
+	}
 
 }

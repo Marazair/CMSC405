@@ -37,7 +37,8 @@ public class FieldScene extends JPanel implements
 	private static final int BOX_LENGTH = 4;
 	private static double[] BOX_RGB = {.65, .53, .33};
 	private static boolean boxOpen = false;
-	private static RectangularPrism box = new RectangularPrism(BOX_HEIGHT, new Rectangle(BOX_WIDTH, BOX_LENGTH, BOX_RGB));
+	private static RectangularPrism box = 
+			new RectangularPrism(BOX_HEIGHT, new Rectangle(BOX_WIDTH, BOX_LENGTH, BOX_RGB));
 	
 	private static float[] SKY_RGB = {0.53f, .81f, .98f};
 	private static final float[] SPOOKY_SKY_RGB = {0.53f, 0.11f, 0.89f};
@@ -48,13 +49,22 @@ public class FieldScene extends JPanel implements
 	private static final int SUN_SIZE = 20;
 	private static final double[] SUN_RGB = {.99, .72, .07};
 	private static final double[] SPOOKY_SUN_RGB = {.29, .01, .01};
+	private static final double[] EYE_COLOR = {1, 1, 1};
+	private static final double[] PUPIL_COLOR = {0, 0, 0};
 	private static Circle sun = new Circle(SUN_SIZE, SUN_RGB);
+	private static Circle eye = new Circle(SUN_SIZE - 5, EYE_COLOR);
+	private static Circle pupil = new Circle(5, PUPIL_COLOR);
 	
 	private static final int TREE_X = 0;
 	private static final int TREE_Y = 0;
 	private static final int TREE_Z = 25;
 	private static final double[] TRUNK_RGB = {.40, .33, .31};
 	private static double[] TREE_RGB = {.13, .55, .13};
+	private static final int TRUNK_HEIGHT = 20;
+	private static final int TRUNK_WIDTH = 5;
+	private static final int TRUNK_LENGTH = 5;
+	private static RectangularPrism trunk = 
+			new RectangularPrism(TRUNK_HEIGHT, new Rectangle(TRUNK_WIDTH, TRUNK_LENGTH, TRUNK_RGB));
 	
 	private static double[] GRASS_RGB = {0, 1, 0};
 	private static final double[] SPOOKY_GRASS_RGB = {.65, 0, 0};
@@ -96,7 +106,7 @@ public class FieldScene extends JPanel implements
         display.addKeyListener(this);
         
         //TODO:  Uncomment the following line to start the animation
-        //startAnimation();
+        startAnimation();
 
     }
 
@@ -140,12 +150,31 @@ public class FieldScene extends JPanel implements
         
         gl.glPushMatrix();
         gl.glTranslated(SUN_X, SUN_Y, SUN_Z);
+        gl.glRotated(-frameNumber*0.7,0,0,1);
         sun.draw(gl);
+        rayDraw(gl);
+        if(boxOpen) {
+        	gl.glTranslated(0, 0, -2);
+        	eye.draw(gl);
+        	gl.glTranslated(0, 0, -2);
+        	pupil.draw(gl);
+        }
+        
         gl.glPopMatrix();
         
         gl.glPushMatrix();
         
         gl.glPopMatrix();
+    }
+    
+    private void rayDraw(GL2 gl2) {
+    	for (int i = 0; i < 13; i++) { // Draw 13 rays, with different rotations.
+            gl2.glRotatef( 360f / 13, 0, 0, 1 ); // Note that the rotations accumulate!
+            gl2.glBegin(GL2.GL_LINES);
+            gl2.glVertex2f(0, 0);
+            gl2.glVertex2f(1.5f * SUN_SIZE, 0);
+            gl2.glEnd();
+        }
     }
     
     private void square(GL2 gl2, double r, double g, double b) {
