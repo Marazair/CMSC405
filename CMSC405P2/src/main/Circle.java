@@ -1,3 +1,11 @@
+/*
+ * File Name: Circle.java
+ * Name: Nicholas Mills
+ * Date: 2/8/2019
+ * Purpose: Contains structure for creating a circle based on a given radius.
+ * 			Primarily taken from CartAndWindmillJogl2D.java.
+ */
+
 package main;
 
 import com.jogamp.opengl.GL2;

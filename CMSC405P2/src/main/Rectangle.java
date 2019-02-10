@@ -1,3 +1,11 @@
+/*
+ * File Name: Rectangle.java
+ * Name: Nicholas Mills
+ * Date: 2/07/2019
+ * Purpose: Contains structure for taking a length and width
+ * 			and constructing a rectangle based on those parameters.
+ */
+
 package main;
 
 import com.jogamp.opengl.GL2;

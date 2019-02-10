@@ -1,6 +1,13 @@
+/*
+ * File Name: Box.java
+ * Name: Nicholas Mills
+ * Date: 2/10/2019
+ * Purpose: Expands upon RectangularPrism, putting eyes
+ * 			on the front face.
+ */
+
 package main;
 
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
 public class Skull extends RectangularPrism {

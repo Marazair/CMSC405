@@ -1,3 +1,11 @@
+/*
+ * File Name: Box.java
+ * Name: Nicholas Mills
+ * Date: 2/10/2019
+ * Purpose: Expands upon RectangularPrism, making the top
+ * 			face removable.
+ */
+
 package main;
 
 import com.jogamp.opengl.GL2;

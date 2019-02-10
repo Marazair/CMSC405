@@ -1,3 +1,11 @@
+/*
+ * File Name: RectangularPrism.java
+ * Name: Nicholas Mills
+ * Date: 2/08/2019
+ * Purpose: Contains structure for taking a rectangle and creating
+ * 			a prism according to it and a corresponding height.
+ */
+
 package main;
 
 import com.jogamp.opengl.GL2;
