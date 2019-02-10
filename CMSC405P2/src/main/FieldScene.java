@@ -2,10 +2,14 @@ package main;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+
 import javax.swing.*;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.*;
+import javax.sound.sampled.*;
 
 /**
  * A template for a basic JOGL application with support for animation, and for
@@ -40,6 +44,7 @@ public class FieldScene extends JPanel implements
 	
 	private static float[] SKY_RGB = {0.53f, .81f, .98f};
 	private static final float[] SPOOKY_SKY_RGB = {0.53f, 0.11f, 0.89f};
+	private static final float[] RED_SKY_RGB = {.65f, 0, 0};
 	
 	private static final int SUN_X = -50;
 	private static final int SUN_Y = 40;
@@ -77,13 +82,16 @@ public class FieldScene extends JPanel implements
 	
 	private static final double[] SKULL_RGB = {.85, .83, .76};
 	private static final int SKULL_SIZE = 4;
+	private static final double SKULL_SPEED = .3;
 	private static int skullDistance = 10;
-	private static int skullX = BOX_X;
-	private static int skullY = BOX_Y + 1;
-	private static int skullZ = BOX_Z;
+	private static double skullX = BOX_X;
+	private static double skullY = BOX_Y + 1;
+	private static double skullZ = BOX_Z;
 	private static Skull skull = 
 			new Skull(SKULL_SIZE, new Rectangle(SKULL_SIZE, SKULL_SIZE, SKULL_RGB));
+	private static final int TIME = 100;
 	private boolean caught = false;
+	private static final String CAUGHT_SOUND_PATH = "resources/Alarm.mp3";
 	
 	private static int px = 0;
 	private static int py = 10;
@@ -195,6 +203,10 @@ public class FieldScene extends JPanel implements
 	        leaves.draw(gl);
 	        gl.glPopMatrix();
 	    }
+        
+        else {
+        	SKY_RGB = RED_SKY_RGB;
+        }
     }
     
     private void rayDraw(GL2 gl2) {
@@ -317,15 +329,25 @@ public class FieldScene extends JPanel implements
         
         if(box.open) {
         	if(frameNumber < boxOpenFrame + BOX_HEIGHT)
-        		skullY++;
-        	else {
+        		skullY += SKULL_SPEED;
+        	else if (frameNumber < boxOpenFrame + TIME){
         		if (skullY < py)
-        			skullY++;
+        			skullY += SKULL_SPEED;
         		if (skullZ > pz + SKULL_SIZE + skullDistance)
-        			skullZ--;
+        			skullZ -= SKULL_SPEED;
         		else if (skullZ < pz + SKULL_SIZE + skullDistance)
         			skullZ++;
+        	}
+        	else {
+        		if (skullZ > pz + SKULL_SIZE)
+        			skullZ -= SKULL_SPEED*5;
+        		else {
+        			if(!caught) {
+        				caught = true;
+        				window.setTitle("It got you...");
+        			}
         			
+        		}
         	}
         }
     }
