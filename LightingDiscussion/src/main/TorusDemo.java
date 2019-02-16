@@ -22,11 +22,11 @@ import com.jogamp.opengl.util.gl2.GLUT;
  *  The base is colored with a spectrum.  (The user can turn the display of
  *  the base on and off.) The mouse can be used to rotate the scene.
  */
-public class FourLights extends JPanel implements GLEventListener {
+public class TorusDemo extends JPanel implements GLEventListener {
 
     public static void main(String[] args) {
         JFrame window = new JFrame("A Lighting Demo");
-        FourLights panel = new FourLights();
+        TorusDemo panel = new TorusDemo();
         window.setContentPane(panel);
         window.pack();
         window.setLocation(50,50);
@@ -41,8 +41,6 @@ public class FourLights extends JPanel implements GLEventListener {
     private JCheckBox greenLight;  // Checked if the green light is on.
     private JCheckBox blueLight;  // Checked if the blue light is on.
     private JCheckBox ambientLight;  // Checked if the global ambient light is on.
-    
-    private JCheckBox drawBase; // Checked if the base should be drawn.
 
     private GLJPanel display;
     private Timer animationTimer;
@@ -56,7 +54,7 @@ public class FourLights extends JPanel implements GLEventListener {
     /**
      * The constructor adds seven checkboxes under the display, to control the options.
      */
-    public FourLights() {
+    public TorusDemo() {
         GLCapabilities caps = new GLCapabilities(null);
         display = new GLJPanel(caps);
         display.setPreferredSize( new Dimension(600,600) );
@@ -94,19 +92,16 @@ public class FourLights extends JPanel implements GLEventListener {
         greenLight = new JCheckBox("Green Light", true);
         ambientLight = new JCheckBox("Global Ambient Light", true);
         animating = new JCheckBox("Animate", true);
-        drawBase = new JCheckBox("Draw Base", true);
         viewpointLight.addActionListener(boxHandler);
         ambientLight.addActionListener(boxHandler);
         redLight.addActionListener(boxHandler);
         greenLight.addActionListener(boxHandler);
         blueLight.addActionListener(boxHandler);
         animating.addActionListener(boxHandler);
-        drawBase.addActionListener(boxHandler);
         JPanel bottom = new JPanel();
         bottom.setLayout(new GridLayout(2,1));
         JPanel row1 = new JPanel();
         row1.add(animating);
-        row1.add(drawBase);
         row1.add(ambientLight);
         bottom.add(row1);
         JPanel row2 = new JPanel();
@@ -149,7 +144,7 @@ public class FourLights extends JPanel implements GLEventListener {
         }
         gl.glPushMatrix();
         gl.glRotated(-frameNumber, 0, 1, 0);
-        gl.glTranslated(10, 7, 0);
+        gl.glTranslated(10, 0, 0);
         gl.glLightfv(GL2.GL_LIGHT1, GL2.GL_POSITION, zero, 0);
         glut.glutSolidSphere(0.5, 16, 8);
         gl.glPopMatrix();
@@ -164,8 +159,8 @@ public class FourLights extends JPanel implements GLEventListener {
             gl.glDisable(GL2.GL_LIGHT2);
         }
         gl.glPushMatrix();
-        gl.glRotated((frameNumber+100)*0.8743, 0, 1, 0);
-        gl.glTranslated(9, 8, 0);
+        gl.glRotated((frameNumber+100)*0.8743, 0, 0, 1);
+        gl.glTranslated(9, 7, 0);
         gl.glLightfv(GL2.GL_LIGHT2, GL2.GL_POSITION, zero, 0);
         glut.glutSolidSphere(0.5, 16, 8);
         gl.glPopMatrix();
@@ -180,8 +175,8 @@ public class FourLights extends JPanel implements GLEventListener {
             gl.glDisable(GL2.GL_LIGHT3);
         }
         gl.glPushMatrix();
-        gl.glRotated((frameNumber-100)*1.3057, 0, 1, 0);
-        gl.glTranslated(9.5, 7.5, 0);
+        gl.glRotated((frameNumber-100)*1.3057, 1, 0, 0);
+        gl.glTranslated(0, 10, 7.5);
         gl.glLightfv(GL2.GL_LIGHT3, GL2.GL_POSITION, zero, 0);
         glut.glutSolidSphere(0.5, 16, 8);
         gl.glPopMatrix();
@@ -268,23 +263,13 @@ public class FourLights extends JPanel implements GLEventListener {
             gl.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, zero, 0 );
         }
 
-        if (drawBase.isSelected()) {
-            gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, zero, 0 );
-    
-            gl.glPushMatrix();
-            gl.glTranslated(0, -5, 0);
-            gl.glRotated(-90, 1, 0, 0);
-            gl.glScaled(10,10,0.5);
-            drawCylinder(gl);
-            gl.glPopMatrix();
-        }
-
         gl.glColor3d(0.7,0.7,0.7);  // sets diffuse and ambient color for teapot
 
         gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, new float[] {0.2F, 0.2F, 0.2F, 1 }, 0);
 
         gl.glPushMatrix();
-        glut.glutSolidTeapot(6);
+        gl.glRotated(-frameNumber*(.5), 0, 0, 1);
+        glut.glutSolidTorus(3, 6, 4, 3);
         gl.glPopMatrix();
     }
 
